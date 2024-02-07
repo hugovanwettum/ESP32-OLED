@@ -2,8 +2,13 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-void Task1_setup();
-void Task1(void *pvParameters);
+// Initialize semaphore
+SemaphoreHandle_t radius_variable_semaphore = xSemaphoreCreateBinary();
+
+void screenTask(void *pvParameters);
+void serverTask(void *pvParameters);
+
+uint16_t sharedVariable_radius = 5;
 
 void setup()
 {
@@ -11,15 +16,24 @@ void setup()
 	Serial.begin(115200);
 	Serial.println("Booting...\n");
 
-	Task1_setup();
+	// Initialize semaphore
+	vSemaphoreCreateBinary(radius_variable_semaphore);
 
 	xTaskCreate(
-		Task1,	 // Task function
-		"Task1", // Task name
-		2048,	 // Stack size (words not bytes)
-		NULL,	 // Task input parameter
-		1,		 // Priority
-		NULL);	 // Task handle
+		screenTask, // Task function
+		"Task1",	// Task name
+		2048,		// Stack size (words not bytes)
+		NULL,		// Task input parameter
+		1,			// Priority
+		NULL);		// Task handle
+
+	xTaskCreate(
+		serverTask, // Task function
+		"Task2",	// Task name
+		4096,		// Stack size (words not bytes)
+		NULL,		// Task input parameter
+		1,			// Priority
+		NULL);		// Task handle
 }
 
 void loop()
