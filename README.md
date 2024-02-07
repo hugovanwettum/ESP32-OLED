@@ -1,9 +1,8 @@
 # ESP32 OLED project
-This project uses an ESP32 and an OLED screen to ...
+This project uses an ESP32 and an OLED screen for a game that can take user input from the ESP32 webserver and display the results on the screen!
 
 # Todos:
 <ul>
-  <li>Add user input via Wifi</li>
   <li>Make an actual game</li>
   <li>Generate QR code for webserver automatically</li>
   <li>Add tests</li>
