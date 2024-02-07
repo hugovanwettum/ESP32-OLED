@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <SPIFFS.h>
 
 #include "WiFiConfig.h" // not synched to remote, only stored locally as it contains my wifi network SSID and password
 
