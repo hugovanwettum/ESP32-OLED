@@ -5,6 +5,7 @@ This project uses an ESP32 and an OLED screen to ...
 <ul>
   <li>Add user input via Wifi</li>
   <li>Make an actual game</li>
+  <li>Generate QR code for webserver automatically</li>
   <li>Add tests</li>
 </ul> 
 
