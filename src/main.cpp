@@ -2,13 +2,16 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+#include "settings.h"
+
 // Initialize semaphore
-SemaphoreHandle_t radius_variable_semaphore = xSemaphoreCreateBinary();
+SemaphoreHandle_t paddle_position_variable_semaphore = xSemaphoreCreateBinary();
 
 void screenTask(void *pvParameters);
 void serverTask(void *pvParameters);
 
-uint16_t sharedVariable_radius = 5;
+// Start paddle in middle of screen
+uint16_t sharedVariable_paddle_position = SCREEN_HEIGHT / 2 - PADDLE_WIDTH/2;
 
 void setup()
 {
@@ -17,7 +20,7 @@ void setup()
 	Serial.println("Booting...\n");
 
 	// Initialize semaphore
-	vSemaphoreCreateBinary(radius_variable_semaphore);
+	vSemaphoreCreateBinary(paddle_position_variable_semaphore);
 
 	xTaskCreate(
 		screenTask, // Task function

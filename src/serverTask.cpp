@@ -1,14 +1,15 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
+#include "settings.h"
 #include "WiFiConfig.h" // not synched to remote, only stored locally as it contains my wifi network SSID and password
 
-extern uint16_t sharedVariable_radius;
+extern uint16_t sharedVariable_paddle_position;
 
 // Set web server port number to 80
 WiFiServer server(80);
 
-extern SemaphoreHandle_t radius_variable_semaphore;
+extern SemaphoreHandle_t paddle_position_variable_semaphore;
 
 void serverTask(void *parameter)
 {
@@ -54,22 +55,80 @@ void serverTask(void *parameter)
                         client.println("<head>");
                         client.println("    <meta charset=\"UTF-8\">");
                         client.println("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-                        client.println("    <title>Ball buttons!</title>");
-                        client.println("</head>");
-                        client.println("<body>");
-                        client.println("    <h1>Ball buttons!</h1>");
-                        client.println("    <button onclick=\"sendButton1Press()\">Increase ball radius</button>");
-                        client.println("    <button onclick=\"sendButton2Press()\">Decrease ball radius</button>");
-                        client.println("    <script>");
-                        client.println("        function sendButton1Press() {");
-                        client.println("            var xhttp = new XMLHttpRequest();");
-                        client.println("            xhttp.open(\"GET\", \"/button1\", true);");
-                        client.println("            xhttp.send();");
+                        client.println("    <title>Pong Paddle Position Control</title>");
+                        client.println("    <style>");
+                        client.println("        body {");
+                        client.println("            display: flex;");
+                        client.println("            flex-direction: column;");
+                        client.println("            align-items: center;");
+                        client.println("            justify-content: flex-end;");
+                        client.println("            height: 100vh;");
+                        client.println("            margin: 0;");
                         client.println("        }");
                         client.println("");
-                        client.println("        function sendButton2Press() {");
+                        client.println("        h1, p, .slidecontainer {");
+                        client.println("            text-align: center;");
+                        client.println("            width: 80%;");
+                        client.println("            margin-bottom: 20px;");
+                        client.println("        }");
+                        client.println("");
+                        client.println("        .slidecontainer {");
+                        client.println("            margin-bottom: 5%;");
+                        client.println("        }");
+                        client.println("");
+                        client.println("        .slider {");
+                        client.println("            -webkit-appearance: none;");
+                        client.println("            width: 100%;");
+                        client.println("            height: 25px;");
+                        client.println("            background: #d3d3d3;");
+                        client.println("            outline: none;");
+                        client.println("            opacity: 0.7;");
+                        client.println("            -webkit-transition: .2s;");
+                        client.println("            transition: opacity .2s;");
+                        client.println("        }");
+                        client.println("");
+                        client.println("        .slider:hover {");
+                        client.println("            opacity: 1;");
+                        client.println("        }");
+                        client.println("");
+                        client.println("        .slider::-webkit-slider-thumb {");
+                        client.println("            -webkit-appearance: none;");
+                        client.println("            appearance: none;");
+                        client.println("            width: 20%; /* Set thumb width as 5% of the screen width */");
+                        client.println("            height: 25px;");
+                        client.println("            background: #04AA6D;");
+                        client.println("            cursor: pointer;");
+                        client.println("        }");
+                        client.println("");
+                        client.println("        .slider::-moz-range-thumb {");
+                        client.println("            width: 20%; /* Set thumb width as 5% of the screen width */");
+                        client.println("            height: 25px;");
+                        client.println("            background: #04AA6D;");
+                        client.println("            cursor: pointer;");
+                        client.println("        }");
+                        client.println("    </style>");
+                        client.println("</head>");
+                        client.println("<body>");
+                        client.println("    <h1>Pong Paddle Position Control</h1>");
+                        client.println("    <p>Drag the slider to set the position of the paddle.</p>");
+                        client.println("    <div class=\"slidecontainer\">");
+                        client.println("        <input type=\"range\" min=\"0\" max=\"6\" value=\"3\" class=\"slider\" id=\"paddleSlider\">");
+                        client.println("        <p>Paddle Position: <span id=\"paddleValue\">3</span></p>");
+                        client.println("    </div>");
+                        client.println("    <script>");
+                        client.println("        var slider = document.getElementById(\"paddleSlider\");");
+                        client.println("        var output = document.getElementById(\"paddleValue\");");
+                        client.println("        output.innerHTML = slider.value;");
+                        client.println("");
+                        client.println("        slider.oninput = function() {");
+                        client.println("            output.innerHTML = this.value;");
+                        client.println("            // Send slider value to ESP32");
+                        client.println("            sendSliderValue(this.value);");
+                        client.println("        }");
+                        client.println("");
+                        client.println("        function sendSliderValue(value) {");
                         client.println("            var xhttp = new XMLHttpRequest();");
-                        client.println("            xhttp.open(\"GET\", \"/button2\", true);");
+                        client.println("            xhttp.open(\"GET\", \"/paddle?position=\" + value, true);");
                         client.println("            xhttp.send();");
                         client.println("        }");
                         client.println("    </script>");
@@ -80,46 +139,22 @@ void serverTask(void *parameter)
                         client.stop();
                         break; // Exit the loop after serving the response
                     }
-                    else if (request.indexOf("GET /button1") != -1)
+                    else if (request.indexOf("GET /paddle") != -1)
                     {
-                        //TODO: move to a separate function
-                        // Handle Button 1 press
-                        Serial.println("Button 1");
-                        // Send a response indicating Button 1 was pressed
+                        // Handle paddle position update
+                        String positionString = request.substring(request.indexOf("position=") + 9);
+                        int paddlePosition = positionString.toInt();
+                        // Update the shared variable
+                        if (xSemaphoreTake(paddle_position_variable_semaphore, portMAX_DELAY) == pdTRUE)
+                        {
+                            sharedVariable_paddle_position = paddlePosition * 8;
+                            xSemaphoreGive(paddle_position_variable_semaphore);
+                        }
+                        // Send a response indicating the paddle position was updated
                         client.println("HTTP/1.1 200 OK");
                         client.println("Content-Type: text/plain");
                         client.println();
-                        // Acquire the semaphore
-                        if (xSemaphoreTake(radius_variable_semaphore, portMAX_DELAY) == pdTRUE)
-                        {
-                            // Modify the shared variable
-                            if (sharedVariable_radius < 31)
-                                sharedVariable_radius++;
-                            // Release the semaphore
-                            xSemaphoreGive(radius_variable_semaphore);
-                        }
-                        // Close the connection
-                        client.stop();
-                        break;
-                    }
-                    else if (request.indexOf("GET /button2") != -1)
-                    {
-                        //TODO: move to a separate function
-                        // Handle Button 2 press
-                        Serial.println("Button 2");
-                        // Send a response indicating Button 2 was pressed
-                        client.println("HTTP/1.1 200 OK");
-                        client.println("Content-Type: text/plain");
-                        client.println();
-                        // Acquire the semaphore
-                        if (xSemaphoreTake(radius_variable_semaphore, portMAX_DELAY) == pdTRUE)
-                        {
-                            // Modify the shared variable
-                            if (sharedVariable_radius > 1)
-                                sharedVariable_radius--;
-                            // Release the semaphore
-                            xSemaphoreGive(radius_variable_semaphore);
-                        }
+                        client.println("Paddle position updated.");
                         // Close the connection
                         client.stop();
                         break;

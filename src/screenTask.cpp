@@ -7,8 +7,9 @@
 // Display object to write to
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-extern SemaphoreHandle_t radius_variable_semaphore;
-extern uint16_t sharedVariable_radius;
+extern SemaphoreHandle_t paddle_position_variable_semaphore;
+
+extern uint16_t sharedVariable_paddle_position;
 
 void screenTask(void *pvParameters)
 {
@@ -23,51 +24,19 @@ void screenTask(void *pvParameters)
             ;
     }
 
-    
-    uint16_t point_x = sharedVariable_radius;
-    uint16_t point_y = SCREEN_HEIGHT / 2;
-
-    int16_t Vx = 1;
-    int16_t Vy = 1;
+    // Start at 1 pixel above border
+    uint16_t paddle_x = 1;
 
     for (;;)
     {
+        // Update the paddle position every loop to get latest value (it is a global variable)
+        uint16_t paddle_y = sharedVariable_paddle_position;
+
         //  Clear the buffer (all pixels to off, black)
         display.clearDisplay();
 
-        // Update the x position based on velocity
-        point_x += Vx;
-        point_y += Vy;
-
-        // Check for collisions
-        // X coordinate right side screen
-        if (point_x + sharedVariable_radius >= SCREEN_WIDTH - 1)
-        {
-            point_x = SCREEN_WIDTH - 1 - sharedVariable_radius;
-            Vx = -Vx;
-        }
-        // X coordinate left side screen
-        if (point_x - sharedVariable_radius <= 0)
-        {
-            point_x = 0 + sharedVariable_radius;
-            Vx = -Vx;
-        }
-        // Y coordinate bottom of screen
-        if (point_y + sharedVariable_radius >= SCREEN_HEIGHT - 1)
-        {
-            point_y = SCREEN_HEIGHT - 1 - sharedVariable_radius;
-            Vy = -Vy;
-        }
-        // Y coordinate top of screen
-        if (point_y - sharedVariable_radius <= 0)
-        {
-            point_y = 0 + sharedVariable_radius;
-            Vy = -Vy;
-        }
-
         // Draw the current position
-        display.fillCircle(point_x, point_y, sharedVariable_radius, SSD1306_WHITE);
-
+        display.drawRect(paddle_x, paddle_y, PADDLE_HEIGHT, PADDLE_WIDTH, SSD1306_WHITE);
         // Push data currently in RAM to SSDD1306
         display.display();
 
