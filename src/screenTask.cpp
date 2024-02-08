@@ -34,7 +34,7 @@ void screenTask(void *pvParameters)
     uint16_t ball_y = random(ball_radius, SCREEN_WIDTH - ball_radius);
 
     // Ball 'speed'
-    uint16_t Dx = 3;
+    uint16_t Dx = 2;
     uint16_t Dy = 2;
 
     // Paddle distance from bottom side
