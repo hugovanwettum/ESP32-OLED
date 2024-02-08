@@ -34,8 +34,8 @@ void screenTask(void *pvParameters)
     uint16_t ball_y = random(ball_radius, SCREEN_WIDTH - ball_radius);
 
     // Ball 'speed'
-    uint16_t Dx = 2;
-    uint16_t Dy = 1;
+    uint16_t Dx = 3;
+    uint16_t Dy = 2;
 
     // Paddle distance from bottom side
     uint16_t paddle_x = ball_radius * 2;
@@ -99,8 +99,8 @@ void screenTask(void *pvParameters)
         {
             loss_count++;
             // reset
-            Dx = 2;
-            ball_x = SCREEN_HEIGHT - ball_radius;
+            Dx = 3;
+            ball_x = SCREEN_WIDTH - SCREEN_WIDTH / 4;
             ball_y = random(ball_radius, SCREEN_WIDTH - ball_radius);
             Serial.println("You lost!");
         }
