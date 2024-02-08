@@ -5,7 +5,6 @@
 
 extern uint16_t sharedVariable_radius;
 
-
 // Set web server port number to 80
 WiFiServer server(80);
 
