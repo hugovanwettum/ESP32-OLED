@@ -14,7 +14,7 @@ void screenTask(void *pvParameters);
 void serverTask(void *pvParameters);
 
 // Start paddle in middle of screen
-uint16_t sharedVariable_paddle_position = SCREEN_HEIGHT / 2 - PADDLE_WIDTH/2;
+uint16_t sharedVariable_paddle_position = SCREEN_HEIGHT / 2 - PADDLE_WIDTH / 2;
 
 void setup()
 {
@@ -26,12 +26,12 @@ void setup()
 	vSemaphoreCreateBinary(paddle_position_variable_semaphore);
 
 	xTaskCreate(
-		screenTask, // Task function
-		"Task1",	// Task name
-		2048,		// Stack size (words not bytes)
-		NULL,		// Task input parameter
-		1,			// Priority
-		&screenTaskHandle);		// Task handle
+		screenTask,			// Task function
+		"Task1",			// Task name
+		2048,				// Stack size (words not bytes)
+		NULL,				// Task input parameter
+		1,					// Priority
+		&screenTaskHandle); // Task handle
 
 	xTaskCreate(
 		serverTask, // Task function
