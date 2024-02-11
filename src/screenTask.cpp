@@ -40,10 +40,29 @@ void screenTask(void *pvParameters)
     // Paddle distance from bottom side
     uint16_t paddle_x = ball_radius * 2;
 
+    // Update the paddle position every loop to get latest value (it is a global variable)
+    uint16_t paddle_y = sharedVariable_paddle_position;
+
+    //  Clear the buffer (all pixels to off, black)
+    display.clearDisplay();
+
+    // Draw the paddle
+    display.drawRect(paddle_x, paddle_y, PADDLE_HEIGHT, PADDLE_WIDTH, SSD1306_WHITE);
+
+    // Draw the ball
+    display.fillCircle(ball_x, ball_y, ball_radius, SSD1306_WHITE);
+
+    // Push data currently in RAM to SSDD1306
+    display.display();
+
+
+    // STALL EXECUTION until received confirmation that a user connected
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
     for (;;)
     {
         // Update the paddle position every loop to get latest value (it is a global variable)
-        uint16_t paddle_y = sharedVariable_paddle_position;
+        paddle_y = sharedVariable_paddle_position;
 
         // Update ball position
         ball_x += Dx;

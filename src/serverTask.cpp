@@ -4,12 +4,20 @@
 #include "settings.h"
 #include "WiFiConfig.h" // not synched to remote, only stored locally as it contains my wifi network SSID and password
 
+// The global variable for paddle position
 extern uint16_t sharedVariable_paddle_position;
 
 // Set web server port number to 80
 WiFiServer server(80);
 
+// Sempahore to deal with the global variable
 extern SemaphoreHandle_t paddle_position_variable_semaphore;
+
+// Task handle of screentask, to send confirmation
+extern TaskHandle_t screenTaskHandle;
+
+// Flag to keep track of whether the game has started
+bool startScreenTask = false;
 
 void serverTask(void *parameter)
 {
@@ -141,6 +149,11 @@ void serverTask(void *parameter)
                     }
                     else if (request.indexOf("GET /paddle") != -1)
                     {
+                        if(startScreenTask == false){
+                            startScreenTask == true;
+                            // Notify Task 2 about the availability of new data
+                            xTaskNotifyGive(screenTaskHandle);
+                        }
                         // Handle paddle position update
                         String positionString = request.substring(request.indexOf("position=") + 9);
                         int paddlePosition = positionString.toInt();

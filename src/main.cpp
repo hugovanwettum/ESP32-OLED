@@ -7,6 +7,9 @@
 // Initialize semaphore
 SemaphoreHandle_t paddle_position_variable_semaphore = xSemaphoreCreateBinary();
 
+// Handle for screentask:
+TaskHandle_t screenTaskHandle; // Task 2 handle
+
 void screenTask(void *pvParameters);
 void serverTask(void *pvParameters);
 
@@ -28,7 +31,7 @@ void setup()
 		2048,		// Stack size (words not bytes)
 		NULL,		// Task input parameter
 		1,			// Priority
-		NULL);		// Task handle
+		&screenTaskHandle);		// Task handle
 
 	xTaskCreate(
 		serverTask, // Task function
