@@ -14,7 +14,7 @@ void screenTask(void *pvParameters);
 void serverTask(void *pvParameters);
 
 // Start paddle in middle of screen
-uint16_t sharedVariable_paddle_position = SCREEN_HEIGHT / 2 - PADDLE_WIDTH / 2;
+uint16_t sharedVariable_paddle_position = SCREEN_HEIGHT / 2 - PADDLE_START_WIDTH / 2;
 
 void setup()
 {

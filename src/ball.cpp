@@ -49,13 +49,13 @@ void Ball::handlePaddleCollision(uint16_t paddleX, uint16_t paddleY, uint16_t pa
     { // test left edge
         testY = paddleY;
     }
-    else if (_y > paddleY + PADDLE_WIDTH)
+    else if (_y > paddleY + paddleWidth)
     { // right edge
-        testY = paddleY + PADDLE_WIDTH;
+        testY = paddleY + paddleWidth;
     }
-    if (_x > paddleX + PADDLE_HEIGHT)
+    if (_x > paddleX + paddleHeight)
     { // test top edge
-        testX = paddleX + PADDLE_HEIGHT;
+        testX = paddleX + paddleHeight;
     }
     else if (_x < paddleX)
     { // bottom edge
@@ -70,7 +70,7 @@ void Ball::handlePaddleCollision(uint16_t paddleX, uint16_t paddleY, uint16_t pa
     // If distance is less than radius, they collided!
     if (distance < _radius)
     {
-        _x = paddleX + PADDLE_HEIGHT + _radius;
+        _x = paddleX + paddleHeight + _radius;
         // bounce back
         _dX = -_dX;
     }
