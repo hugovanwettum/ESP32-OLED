@@ -6,6 +6,7 @@
 #include "settings.h"
 #include "ball.h"
 #include "paddle.h"
+#include "renderer.h"
 
 // Display object to write to
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
@@ -13,7 +14,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 // Semaphore for dealing with the global variable
 extern SemaphoreHandle_t paddle_position_variable_semaphore;
 
-// The global variable
+// The global variable of paddle position
 extern uint16_t sharedVariable_paddle_position;
 
 void screenInit()
@@ -55,8 +56,10 @@ void screenTask(void *pvParameters)
     Ball ball(4, SCREEN_HEIGHT - 4, random(4, SCREEN_WIDTH - 4), 2, 2);
 
     // Create Paddle object
-    // It spawns a bit above the 
     Paddle paddle(ball.getRadius() * 2, sharedVariable_paddle_position, PADDLE_HEIGHT, PADDLE_START_WIDTH);
+
+    // Create Renderer object
+    Renderer renderer(display);
 
     // Draw splashscreen until a user connects:
     drawSplashScreen(ball.getX(), ball.getY(), ball.getRadius(), paddle.getX(), paddle.getY());
@@ -85,16 +88,13 @@ void screenTask(void *pvParameters)
         display.clearDisplay();
 
         // Draw the paddle
-        display.drawRect(paddle.getX(), paddle.getY(), paddle.getHeight(), paddle.getWidth(), SSD1306_WHITE);
+        renderer.drawPaddle(paddle);
 
         // Draw the ball
-        display.fillCircle(ball.getX(), ball.getY(), ball.getRadius(), SSD1306_WHITE);
+        renderer.drawBall(ball);
 
         // Draw scoreboard
-        for (int i = 0; i < loss_count; i++)
-        {
-            display.drawPixel(SCREEN_WIDTH - 1, i * 4, SSD1306_WHITE);
-        }
+        renderer.drawScore(loss_count);
 
         // Push data to SSDD1306
         display.display();
