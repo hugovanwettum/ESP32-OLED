@@ -14,6 +14,11 @@ void Renderer::drawPaddle(const Paddle& paddle)
     _display.drawRect(paddle.getX(), paddle.getY(), paddle.getHeight(), paddle.getWidth(), SSD1306_WHITE);
 }
 
+void Renderer::drawBlock(const Block& block)
+{
+    _display.drawRect(block.getX(), block.getY(), block.getHeight(), block.getWidth(), SSD1306_WHITE);
+}
+
 void Renderer::drawScore(int loss_count)
 {
     // For every loss, draw a pixel on the top row of the screen

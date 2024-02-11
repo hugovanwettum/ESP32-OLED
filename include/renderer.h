@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "ball.h"
 #include "paddle.h"
+#include "block.h"
 
 class Renderer
 {
@@ -17,11 +18,11 @@ public:
 
     void drawBall(const Ball& ball);
     void drawPaddle(const Paddle& paddle);
+    void drawBlock(const Block& block);
     void drawScore(int lossCount);
 
 private:
     // Display object to write to
-
     Adafruit_SSD1306 _display;
 };
 
