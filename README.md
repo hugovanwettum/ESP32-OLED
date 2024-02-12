@@ -3,9 +3,13 @@ This project uses an ESP32 and an OLED screen for a game that can take user inpu
 
 # Todos:
 <ul>
-  <li>Make an actual game</li>
+  <li>Fix collision bug</li>
+  <li>Add start-up screen</li>
+  <li>Add levels</li>
+  <li>Add different types of blocks (drop powerups)</li>
   <li>Generate QR code for webserver automatically</li>
   <li>Add tests</li>
+  <li>Use bugs/issues</li>
 </ul> 
 
 # Compiling
