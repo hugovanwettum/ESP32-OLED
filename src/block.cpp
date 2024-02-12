@@ -31,7 +31,7 @@ int Block::checkCollision(uint16_t ballX, uint16_t ballY, uint16_t ballRadius) c
     float testX = ballX;
     float testY = ballY;
 
-    // Compute which edge is closest
+    // What edges should be tested?
     if (ballY < _y)
     { // test left edge
         testY = _y;
@@ -50,21 +50,22 @@ int Block::checkCollision(uint16_t ballX, uint16_t ballY, uint16_t ballRadius) c
     }
 
     // Compute distance from ball to closest edge
-    float distX = ballX - testX;
-    float distY = ballY - testY;
+    float distX = abs(ballX - testX);
+    float distY = abs(ballY - testY);
     float distance = sqrt((distX * distX) + (distY * distY));
 
     // If distance is less than radius, they collided!
     if (distance < ballRadius)
     {
-        if (distY < distX)
+        // Determine which edge type was collided with and return the corresponding integer value
+        if (testY == _y || testY == _y + _width)
         {
-            // return 1 if the collision was the side of the block
+            // Collision with side of block
             return 1;
         }
         else
         {
-            // return 2 if the collision was top or bottom of the block
+            // Collision with top or bottom of block
             return 2;
         }
     }

@@ -59,15 +59,15 @@ void screenTask(void *pvParameters)
     // Count the number of times the ball goes past the paddle
     int loss_count = 0;
 
-    // Create Ball object for radius = 4, and dX = 2, dY = 1
-    Ball ball(4, ball.getRadius() * 3, random(4, SCREEN_WIDTH - 4), 2, 1);
+    // Create Ball object for radius = 3, and dX = 2, dY = 1
+    Ball ball(3, ball.getRadius() * 3, random(4, SCREEN_WIDTH - 4), 2, 1);
 
     // Create Paddle object
-    Paddle paddle(ball.getRadius() * 2, sharedVariable_paddle_position, PADDLE_HEIGHT, PADDLE_START_WIDTH);
+    Paddle paddle(ball.getRadius() * 2 - 1, sharedVariable_paddle_position, PADDLE_HEIGHT, PADDLE_START_WIDTH);
 
     // Create vector of blocks
-    const int NUM_BLOCKS_ROW_ONE = 3;
-    const int NUM_BLOCKS_ROW_TWO = 3;
+    const int NUM_BLOCKS_ROW_ONE = 6;
+    const int NUM_BLOCKS_ROW_TWO = 4;
     // Vector to store blocks
     std::vector<Block> blocks;
     // Create first row of blocks
@@ -75,8 +75,8 @@ void screenTask(void *pvParameters)
     {
         uint16_t x = SCREEN_WIDTH * 3 / 4;
         uint16_t y = (SCREEN_HEIGHT / (NUM_BLOCKS_ROW_ONE + 1)) * i - 1;
-        uint16_t width = 12;
-        uint16_t height = 6;
+        uint16_t width = 4;
+        uint16_t height = 2;
 
         blocks.push_back(Block(x, y, width, height));
     }
