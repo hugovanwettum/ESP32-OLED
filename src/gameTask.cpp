@@ -53,27 +53,30 @@ void screenTask(void *pvParameters)
     // Handle screen Initialization
     screenInit();
 
+    // Create Renderer object
+    Renderer renderer(display);
+
+    // Count the number of times the ball goes past the paddle
     int loss_count = 0;
 
-    // Create Ball object for radius = 1, and dX = 2, dY = 1
-    Ball ball(1, ball.getRadius() * 3, random(4, SCREEN_WIDTH - 4), 2, 1);
+    // Create Ball object for radius = 4, and dX = 2, dY = 1
+    Ball ball(4, ball.getRadius() * 3, random(4, SCREEN_WIDTH - 4), 2, 1);
 
     // Create Paddle object
     Paddle paddle(ball.getRadius() * 2, sharedVariable_paddle_position, PADDLE_HEIGHT, PADDLE_START_WIDTH);
 
-    // Create blocks
+    // Create vector of blocks
     const int NUM_BLOCKS_ROW_ONE = 3;
     const int NUM_BLOCKS_ROW_TWO = 3;
     // Vector to store blocks
     std::vector<Block> blocks;
-
     // Create first row of blocks
     for (int i = 1; i < NUM_BLOCKS_ROW_ONE + 1; i++)
     {
         uint16_t x = SCREEN_WIDTH * 3 / 4;
         uint16_t y = (SCREEN_HEIGHT / (NUM_BLOCKS_ROW_ONE + 1)) * i - 1;
-        uint16_t width = 8;
-        uint16_t height = 4;
+        uint16_t width = 12;
+        uint16_t height = 6;
 
         blocks.push_back(Block(x, y, width, height));
     }
@@ -87,9 +90,6 @@ void screenTask(void *pvParameters)
 
         blocks.push_back(Block(x, y, width, height));
     }
-
-    // Create Renderer object
-    Renderer renderer(display);
 
     // Draw splashscreen until a user connects:
     drawSplashScreen(ball.getX(), ball.getY(), ball.getRadius(), paddle.getX(), paddle.getY());

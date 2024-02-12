@@ -84,7 +84,7 @@ uint16_t Ball::checkLossCondition(uint16_t lossCount)
         lossCount++;
         // Also reset the ball position
         _x = _radius * 3;
-        _y = random(_radius, SCREEN_WIDTH - _radius);
+        _y = random(_radius, SCREEN_HEIGHT - _radius);
         // And reset the direction
         _dX = 2;
     }
