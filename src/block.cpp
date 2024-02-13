@@ -25,42 +25,36 @@ uint16_t Block::getHeight() const
     return _height;
 }
 
+// Helper function to clamp a value between a minimum and maximum
+float clamp(float value, float min, float max)
+{
+    return (value < min) ? min : (value > max) ? max
+                                               : value;
+}
+
 // Check collision with ball
 int Block::checkCollision(uint16_t ballX, uint16_t ballY, uint16_t ballRadius) const
 {
-    float testX = ballX;
-    float testY = ballY;
+    // Define a small tolerance value
+    const float epsilon = 0.1;
 
-    // What edges should be tested?
-    if (ballY < _y)
-    { // test left edge
-        testY = _y;
-    }
-    else if (ballY > _y + _width)
-    { // right edge
-        testY = _y + _width;
-    }
-    if (ballX > _x + _height)
-    { // test top edge
-        testX = _x + _height;
-    }
-    else if (ballX < _x)
-    { // bottom edge
-        testX = _x;
-    }
+    // Calculate the closest point on the block's boundary to the ball
+    float closestX = clamp(ballX, _x, _x + _height);
+    float closestY = clamp(ballY, _y, _y + _width);
 
-    // Compute distance from ball to closest edge
-    float distX = abs(ballX - testX);
-    float distY = abs(ballY - testY);
-    float distance = sqrt((distX * distX) + (distY * distY));
+    // Calculate distance between the ball and the closest point on the block
+    float distanceX = ballX - closestX;
+    float distanceY = ballY - closestY;
+    // Euclidean distance using Pythagorean theorem
+    float distance = sqrt((distanceX * distanceX) + (distanceY * distanceY));
 
     // If distance is less than radius, they collided!
-    if (distance < ballRadius)
+    if (distance <= ballRadius)
     {
         // Determine which edge type was collided with and return the corresponding integer value
-        if (testY == _y || testY == _y + _width)
+        if (fabs(distanceY) > fabs(distanceX))
         {
-            // Collision with side of block
+            // The ball is closer to the sides than the top or bottom
             return 1;
         }
         else

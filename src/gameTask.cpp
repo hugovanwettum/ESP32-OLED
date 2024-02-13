@@ -59,36 +59,31 @@ void screenTask(void *pvParameters)
     // Count the number of times the ball goes past the paddle
     int loss_count = 0;
 
-    // Create Ball object for radius = 3, and dX = 2, dY = 1
-    Ball ball(3, ball.getRadius() * 3, random(4, SCREEN_WIDTH - 4), 2, 1);
+    // Create Ball object for radius = 2, and dX = 2, dY = 1
+    Ball ball(2, ball.getRadius() * 2, random(4, SCREEN_WIDTH - 4), 2, 1);
 
     // Create Paddle object
     Paddle paddle(ball.getRadius() * 2 - 1, sharedVariable_paddle_position, PADDLE_HEIGHT, PADDLE_START_WIDTH);
 
     // Create vector of blocks
-    const int NUM_BLOCKS_ROW_ONE = 6;
-    const int NUM_BLOCKS_ROW_TWO = 4;
+    const int NUM_ROWS = 6;
+    const int NUM_COLUMNS = 4;
     // Vector to store blocks
     std::vector<Block> blocks;
-    // Create first row of blocks
-    for (int i = 1; i < NUM_BLOCKS_ROW_ONE + 1; i++)
+    // Create block objects
+    // For every row:
+    for (int j = 0; j < NUM_ROWS; ++j)
     {
-        uint16_t x = SCREEN_WIDTH * 3 / 4;
-        uint16_t y = (SCREEN_HEIGHT / (NUM_BLOCKS_ROW_ONE + 1)) * i - 1;
-        uint16_t width = 4;
-        uint16_t height = 2;
+        // And for every column:
+        for (int i = 0; i < NUM_COLUMNS; i++)
+        {
+            uint16_t width = 16;
+            uint16_t height = 8;
+            uint16_t x = SCREEN_WIDTH - (j + 1) * height;
+            uint16_t y = i * width;
 
-        blocks.push_back(Block(x, y, width, height));
-    }
-    // Create second row of blocks
-    for (int i = 1; i < NUM_BLOCKS_ROW_TWO + 1; i++)
-    {
-        uint16_t x = SCREEN_WIDTH / 2;
-        uint16_t y = (SCREEN_HEIGHT / (NUM_BLOCKS_ROW_TWO + 1)) * i - 1;
-        uint16_t width = 8;
-        uint16_t height = 4;
-
-        blocks.push_back(Block(x, y, width, height));
+            blocks.push_back(Block(x, y, width, height));
+        }
     }
 
     // Draw splashscreen until a user connects:
