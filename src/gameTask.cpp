@@ -3,6 +3,7 @@
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <qrcode.h>
 
 #include "settings.h"
 #include "ball.h"
@@ -32,19 +33,47 @@ void screenInit()
     }
 }
 
-void drawSplashScreen(uint16_t ball_x, uint16_t ball_y, uint16_t ball_radius, uint16_t paddle_x, uint16_t paddle_y)
-{
-    //  Clear the buffer (all pixels to off, black)
+void displayQRCode(esp_qrcode_handle_t qrcode) {
+    // Credits: https://www.hackster.io/mdraber/generate-qr-codes-with-arduino-on-oled-display-53c074
+    
+    // Clear the display
     display.clearDisplay();
 
-    // Draw the paddle
-    display.drawRect(paddle_x, paddle_y, PADDLE_HEIGHT, PADDLE_START_WIDTH, SSD1306_WHITE);
+    // Calculate the scale factor
+    int scale = min(display.width() / esp_qrcode_get_size(qrcode), display.height() / esp_qrcode_get_size(qrcode));
+  
+    // Calculate horizontal shift
+    int shiftX = (display.width() - esp_qrcode_get_size(qrcode) * scale) / 2;
+  
+    // Calculate vertical shift
+    int shiftY = (display.height() - esp_qrcode_get_size(qrcode) * scale) / 2;
 
-    // Draw the ball
-    display.fillCircle(ball_x, ball_y, ball_radius, SSD1306_WHITE);
+    // Draw the QR code on the display
+    for (uint8_t y = 0; y < esp_qrcode_get_size(qrcode); y++) {
+        for (uint8_t x = 0; x < esp_qrcode_get_size(qrcode); x++) {
+            if (esp_qrcode_get_module(qrcode, x, y)) {
+                display.fillRect(shiftX + x * scale, shiftY + y * scale, scale, scale, WHITE);
+            }
+        }
+    }
 
-    // Push data currently in RAM to SSDD1306
+    // Update the display
     display.display();
+}
+
+void generateQRCode(const char* text) {
+    // Define the configuration for QR code generation
+    esp_qrcode_config_t config = ESP_QRCODE_CONFIG_DEFAULT();
+
+    // Set the display function to the custom function given above
+    config.display_func = displayQRCode;
+
+    // Generate the QR code
+    esp_err_t err = esp_qrcode_generate(&config, text);
+    if (err != ESP_OK) {
+        // Handle error
+        printf("Failed to generate QR code. Error code: %d\n", err);
+    }
 }
 
 void screenTask(void *pvParameters)
@@ -86,8 +115,9 @@ void screenTask(void *pvParameters)
         }
     }
 
-    // Draw splashscreen until a user connects:
-    drawSplashScreen(ball.getX(), ball.getY(), ball.getRadius(), paddle.getX(), paddle.getY());
+    // Create a QR code for the webpage to connect to
+    // For now considered static, can also get the IP from the server task
+    generateQRCode("192.168.1.87");
 
     // STALL EXECUTION until received confirmation that a user connected
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
