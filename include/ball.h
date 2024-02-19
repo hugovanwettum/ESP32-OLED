@@ -36,7 +36,7 @@ public:
 private:
     uint16_t _radius;
     uint16_t _x, _y;
-    uint16_t _dX, _dY;
+    float _dX, _dY;
 };
 
 #endif // BALL_H

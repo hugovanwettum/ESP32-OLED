@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "block.h"
+#include "helperFunctions.h" //clamp
 
 Block::Block(uint16_t x, uint16_t y, uint16_t width, uint16_t height) : _x(x), _y(y), _width(width), _height(height), _destroyed(false) {}
 
@@ -23,13 +24,6 @@ uint16_t Block::getWidth() const
 uint16_t Block::getHeight() const
 {
     return _height;
-}
-
-// Helper function to clamp a value between a minimum and maximum
-float clamp(float value, float min, float max)
-{
-    return (value < min) ? min : (value > max) ? max
-                                               : value;
 }
 
 // Check collision with ball

@@ -1,5 +1,6 @@
 #include "ball.h"
 #include "settings.h"
+#include "helperFunctions.h" //clamp
 
 Ball::Ball(uint16_t radius, uint16_t startX, uint16_t startY, uint16_t speedX, uint16_t speedY) : _radius(radius), _x(startX), _y(startY), _dX(speedX), _dY(speedY) {}
 
@@ -39,6 +40,8 @@ void Ball::handleWallCollision()
     }
 }
 
+
+
 void Ball::handlePaddleCollision(uint16_t paddleX, uint16_t paddleY, uint16_t paddleWidth, uint16_t paddleHeight)
 {
     float testX = _x;
@@ -70,9 +73,15 @@ void Ball::handlePaddleCollision(uint16_t paddleX, uint16_t paddleY, uint16_t pa
     // If distance is less than radius, they collided!
     if (distance < _radius)
     {
+        // In case ball went into paddle, reset the 'height' of the ball to be above the paddle
         _x = paddleX + paddleHeight + _radius;
-        // bounce back
+        // Bounce back up:
         _dX = -_dX;
+        // bounce back at a slightly random angle
+        float randomAngle = random(-PI / 8, PI / 8);
+        _dY = _dY + cos(randomAngle);
+        // Bound dY
+        _dY = clamp(_dY, -0.7, 1.3);
     }
 }
 
